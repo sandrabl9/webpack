@@ -1,4 +1,6 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const { mainModule } = require('process');
 
 const ruleForStyles = {
     test: /\.css$/,
@@ -25,9 +27,26 @@ const ruleForJavaScript = {
 
 const rules = [ruleForJavaScript, ruleForStyles]
 
-module.exports = {
+module.exports = (env, argv) => {
+    const {mode} = argv;
+    const isProduction = mode === 'production';
+    
+    return {
     output: {
+        filename: isProduction
+        ? '[name].[contenthash].js'
+        : 'main.js',
         path: path.resolve(__dirname,'build')
     },
-    module: { rules }
+    plugins: [
+       new HtmlWebpackPlugin({ template: 'src/index.html' })
+    ],
+    module: { rules },
+    devServer: {
+        open: true, // abrirnos el navegador
+        port: 3000,
+        compress: true
+    }
+    }
+
 };
